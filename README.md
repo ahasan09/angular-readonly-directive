@@ -1,27 +1,52 @@
-# MakeReadonly
+# Angular Readonly Directive
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
+A custom Angular attribute directive (`appReadOnly`) that makes any form element non-editable. Supports toggling the readonly state dynamically via a service.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Custom `ReadOnly` attribute directive for any `<input>`, `<textarea>`, or `<select>`
+- `ReadOnlyService` to toggle readonly state globally or per-field
 
-## Code scaffolding
+## Tech Stack
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Angular (CLI v1.7.4)
+- TypeScript
 
-## Build
+## Prerequisites
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+- [Node.js](https://nodejs.org/) v10+
+- Angular CLI: `npm install -g @angular/cli`
 
-## Running unit tests
+## Getting Started
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+git clone https://github.com/ahasan09/angular-readonly-directive
+cd angular-readonly-directive
+npm install
+ng serve
+```
 
-## Running end-to-end tests
+Open [http://localhost:4200](http://localhost:4200).
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+## Usage
 
-## Further help
+```html
+<input type="text" appReadOnly [isReadOnly]="true" />
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `ng serve` | Start dev server on port 4200 |
+| `ng build --prod` | Production build |
+| `ng test` | Run unit tests (Karma) |
+| `ng e2e` | Run end-to-end tests (Protractor) |
+
+## Key Files
+
+```
+src/app/
+├── read-only.directive.ts   # The custom directive
+└── read-only.service.ts     # Service to toggle readonly state
+```
