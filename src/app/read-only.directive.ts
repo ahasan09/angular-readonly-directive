@@ -1,96 +1,47 @@
-import { Directive, Input, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Directive, ElementRef, Input, OnInit, inject, effect } from '@angular/core';
 import { ReadOnlyService } from './read-only.service';
 
-export interface IModel {
-  IsReadable: boolean;
-  DomId: string;
-}
-
 @Directive({
-  selector: '[read-only]'
+  selector: '[appReadOnly]',
+  standalone: true,
 })
-export class ReadOnlyDirective implements AfterViewInit {
-  @Input('read-only') readOnlyObj: IModel;
+export class ReadOnlyDirective implements OnInit {
+  @Input('appReadOnly') group = 'default';
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private readOnlyService: ReadOnlyService
-  ) {
+  private readonly el = inject(ElementRef);
+  private readonly readOnlyService = inject(ReadOnlyService);
 
-  }
-
-  ngOnInit() {
-    this.readOnlyService.readOnlyEvent.subscribe((response: IModel) => {
-      this.executeDisableControls(response);
-    })
-  }
-
-  executeDisableControls(payload: IModel) {
-    if (!isPlatformBrowser(this.platformId))
-      return;
-
-    let controls = this.getAllControls(payload['DomId']);
-
-    if (payload['IsReadable'])
-      this.setDisableAttribute(controls);
-    else
-      this.removeDisableAttribute(controls);
-  }
-
-  ngAfterViewInit() {
-    this.executeDisableControls(this.readOnlyObj);
-  }
-
-  getAllControls(domId) {
-    const parentElement: HTMLElement = document.getElementById(domId) as HTMLElement;
-    let controls: any = [];
-
-    const inputElments = parentElement.getElementsByTagName('input');
-    const txtAreaElments = parentElement.getElementsByTagName('textarea');
-    const autocompleteElments = parentElement.getElementsByTagName('mat-autocomplete');
-    const datepickerElments = parentElement.getElementsByTagName('mat-datepicker');
-    const buttonElments = parentElement.getElementsByTagName('button');
-    const checkboxElments = parentElement.getElementsByTagName('mat-checkbox');
-    const radioElments = parentElement.getElementsByTagName('mat-radio-button');
-    const sliderElments = parentElement.getElementsByTagName('mat-slider');
-    const slideToggleElments = parentElement.getElementsByTagName('mat-slide-toggle');
-    const btnToggleElments = parentElement.getElementsByTagName('mat-button-toggle');
-    const chipElments = parentElement.getElementsByTagName('mat-chip');
-    const formFieldElments = parentElement.getElementsByTagName('mat-form-field');
-    const anchorElments = parentElement.getElementsByTagName('a');
-    const spanElments = parentElement.getElementsByTagName('span');
-
-    controls = controls.concat(
-      inputElments, txtAreaElments, autocompleteElments,
-      datepickerElments, buttonElments, checkboxElments,
-      radioElments, sliderElments, slideToggleElments,
-      btnToggleElments, chipElments, formFieldElments,
-      anchorElments, spanElments);
-
-    return controls;
-  }
-
-  setDisableAttribute(allControls) {
-    allControls.forEach(controls => {
-      for (let i = 0; i < controls.length; i++) {
-        controls[i]['disabled'] = true;
-
-        if (controls[i].classList.contains('cursor-pointer'))
-          controls[i].classList.remove('cursor-pointer');
-
-        controls[i].style['pointer-events'] = 'none';
-      }
+  constructor() {
+    effect(() => {
+      const state = this.readOnlyService.readOnlyState();
+      const isReadOnly = state[this.group] ?? false;
+      this.applyReadOnly(isReadOnly);
     });
   }
 
-  removeDisableAttribute(allControls) {
-    allControls.forEach(controls => {
-      for (let i = 0; i < controls.length; i++) {
-        controls[i]['disabled'] = false;
-        controls[i].style['pointer-events'] = null;
-      }
-    });
+  ngOnInit(): void {
+    this.applyReadOnly(this.readOnlyService.isReadOnly(this.group));
   }
 
+  private applyReadOnly(isReadOnly: boolean): void {
+    const host: HTMLElement = this.el.nativeElement as HTMLElement;
+    const tags = [
+      'input', 'textarea', 'button', 'select', 'mat-checkbox',
+      'mat-radio-button', 'mat-slider', 'mat-slide-toggle',
+      'mat-button-toggle', 'mat-chip', 'mat-select', 'a',
+    ];
+
+    for (const tag of tags) {
+      const elements = Array.from(host.getElementsByTagName(tag)) as HTMLInputElement[];
+      for (const el of elements) {
+        if (isReadOnly) {
+          el.disabled = true;
+          el.style.pointerEvents = 'none';
+        } else {
+          el.disabled = false;
+          el.style.pointerEvents = '';
+        }
+      }
+    }
+  }
 }
