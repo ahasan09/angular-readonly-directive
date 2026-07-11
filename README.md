@@ -1,6 +1,6 @@
 # Angular Read-Only Directive
 
-A reusable Angular 19 attribute directive (`[appReadOnly]`) that disables all Angular Material form controls inside a container DOM subtree. State is toggled via a service backed by Angular Signals, with support for multiple independent read-only zones on the same page.
+A reusable Angular 22 attribute directive (`[appReadOnly]`) that disables all Angular Material form controls inside a container DOM subtree. State is toggled via a service backed by Angular Signals, with support for multiple independent read-only zones on the same page.
 
 ## Features
 
@@ -14,7 +14,7 @@ A reusable Angular 19 attribute directive (`[appReadOnly]`) that disables all An
 
 ## Tech Stack
 
-- Angular 19
+- Angular 22
 - Angular Material 19
 - TypeScript 5.6 (strict)
 - Angular Signals
